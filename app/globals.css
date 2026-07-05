@@ -208,3 +208,13 @@
   font-size: 12px;
   line-height: 16px;
 }
+
+/* NProgress Premium Gold loader bar style */
+#nprogress .bar {
+  background: #F5B301 !important;
+  height: 2.5px !important;
+  box-shadow: 0 0 8px rgba(245, 179, 1, 0.4) !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #F5B301, 0 0 5px #F5B301 !important;
+}

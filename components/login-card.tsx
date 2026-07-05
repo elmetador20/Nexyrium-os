@@ -225,7 +225,11 @@ export function LoginCard() {
 
         {/* Login Button */}
         <div className="pt-2">
-          <LoadingButton type="submit" loading={loading}>
+          <LoadingButton 
+            type="submit" 
+            loading={loading}
+            className="h-11 w-full rounded-xl bg-amber-500 text-black hover:bg-amber-450 font-bold text-xs uppercase tracking-wider transition-all focus-visible:ring-amber-500 disabled:opacity-50 cursor-pointer shadow-[0_0_20px_rgba(245,179,1,0.15)]"
+          >
             <span className="flex items-center justify-center gap-2">
               Access Dashboard
               <ArrowRight className="h-4 w-4 transition-transform group-hover/button:translate-x-0.5" />
