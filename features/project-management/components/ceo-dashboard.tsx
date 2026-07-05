@@ -14,6 +14,7 @@ import {
   Briefcase
 } from "lucide-react";
 import { getCeoDashboardAction } from "../../../app/actions/projects";
+import { CountUp } from "@/components/ui/count-up";
 
 export function CeoDashboard() {
   const [data, setData] = useState<any>(null);
@@ -34,8 +35,26 @@ export function CeoDashboard() {
 
   if (loading) {
     return (
-      <div className="h-96 flex items-center justify-center text-zinc-500 text-xs">
-        Compiling organizational telemetry...
+      <div className="p-8 lg:p-12 space-y-8 max-w-7xl mx-auto text-xs animate-pulse bg-zinc-950 min-h-screen">
+        {/* Header Skeleton */}
+        <div className="space-y-3">
+          <div className="h-3 w-28 bg-zinc-850 rounded-lg" />
+          <div className="h-8 w-64 bg-zinc-850 rounded-lg" />
+          <div className="h-3 w-96 bg-zinc-850 rounded-lg" />
+        </div>
+        
+        {/* KPI Grid Skeleton */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-28 border border-zinc-800 bg-zinc-900/40 p-6 rounded-2xl space-y-4" />
+          ))}
+        </div>
+        
+        {/* Charts Grid Skeleton */}
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className="md:col-span-2 h-72 border border-zinc-800 bg-zinc-900/40 rounded-2xl" />
+          <div className="h-72 border border-zinc-800 bg-zinc-900/40 rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -60,10 +79,12 @@ export function CeoDashboard() {
       {/* KPI stats */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Total Arr Earnings</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">${revenue.total.toLocaleString()}</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={revenue.total} prefix="$" />
+            </span>
             <span className="text-[9px] text-emerald-450 font-bold flex items-center gap-0.5 font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">
               <TrendingUp className="h-3 w-3" />
               <span>+{revenue.growthRate}%</span>
@@ -71,26 +92,32 @@ export function CeoDashboard() {
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-75">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-75">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Sales Pipeline Size</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">${sales.pipelineValue.toLocaleString()}</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={sales.pipelineValue} prefix="$" />
+            </span>
             <Target className="h-4.5 w-4.5 text-amber-500" />
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-150">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-150">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Projects Health Score</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">{projects.healthScore}% SLA</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={projects.healthScore} suffix="% SLA" />
+            </span>
             <FolderGit2 className="h-4.5 w-4.5 text-purple-400" />
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-200">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-200">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Clients Growth</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">{clientGrowth.totalClients} Clients</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={clientGrowth.totalClients} suffix=" Clients" />
+            </span>
             <span className="text-[9px] text-cyan-400 font-bold font-mono bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">+{clientGrowth.newThisMonth} new</span>
           </div>
         </div>

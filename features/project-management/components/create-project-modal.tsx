@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, Loader2 } from "lucide-react";
 import { ProjectServiceType, ProjectPriority } from "../types";
 
 interface CreateProjectModalProps {
@@ -260,9 +260,16 @@ export function CreateProjectModal({
             <button 
               type="submit" 
               disabled={isSubmitting}
-              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:bg-zinc-800 disabled:text-zinc-650 text-black font-extrabold rounded-xl cursor-pointer transition flex items-center gap-1.5 text-xs"
+              className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-extrabold rounded-xl cursor-pointer transition flex items-center gap-1.5 text-xs shadow-[0_0_15px_rgba(245,179,1,0.15)]"
             >
-              {isSubmitting ? "Initializing..." : "Launch Project"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Launching...</span>
+                </>
+              ) : (
+                <span>Launch Project</span>
+              )}
             </button>
           </div>
         </form>

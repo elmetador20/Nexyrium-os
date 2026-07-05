@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { DashboardStats } from "../types";
 import { cn } from "@/lib/utils";
+import { CountUp } from "@/components/ui/count-up";
 
 interface DashboardViewProps {
   stats: DashboardStats;
@@ -96,6 +97,7 @@ export function DashboardView({ stats, onTabChange, onOpenCreateUser }: Dashboar
     {
       title: "Total Clients",
       value: stats.totalClients,
+      isNumber: true,
       desc: "+12.4% MoM growth",
       icon: Briefcase,
       color: "text-blue-500",
@@ -104,6 +106,7 @@ export function DashboardView({ stats, onTabChange, onOpenCreateUser }: Dashboar
     {
       title: "Active Projects",
       value: stats.activeProjects,
+      isNumber: true,
       desc: "Completion rate: 94%",
       icon: FolderKanban,
       color: "text-emerald-500",
@@ -111,7 +114,9 @@ export function DashboardView({ stats, onTabChange, onOpenCreateUser }: Dashboar
     },
     {
       title: "Revenue This Month",
-      value: formatCurrency(stats.revenueThisMonth),
+      value: stats.revenueThisMonth,
+      isNumber: true,
+      prefix: "$",
       desc: "+$6,200 ahead of target",
       icon: DollarSign,
       color: "text-amber-500",
@@ -120,6 +125,7 @@ export function DashboardView({ stats, onTabChange, onOpenCreateUser }: Dashboar
     {
       title: "Pending Approvals",
       value: stats.pendingUserApprovals,
+      isNumber: true,
       desc: "Needs immediate action",
       icon: ShieldAlert,
       color: stats.pendingUserApprovals > 0 ? "text-red-500 animate-pulse" : "text-zinc-500",
@@ -163,8 +169,8 @@ export function DashboardView({ stats, onTabChange, onOpenCreateUser }: Dashboar
               key={i}
               onClick={card.onClick}
               className={cn(
-                "rounded-xl border border-[#1E293B] bg-[#0F172A]/40 p-5 space-y-3 transition-all duration-200",
-                card.onClick && "hover:border-[#3B82F6]/50 cursor-pointer hover:bg-[#1E293B]/20"
+                "rounded-xl border border-[#1E293B] bg-[#0F172A]/40 p-5 space-y-3 transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.03)]",
+                card.onClick && "hover:border-amber-500/50 cursor-pointer hover:bg-[#1E293B]/20"
               )}
             >
               <div className="flex items-center justify-between text-zinc-400">
@@ -174,7 +180,13 @@ export function DashboardView({ stats, onTabChange, onOpenCreateUser }: Dashboar
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-bold tracking-tight text-white">{card.value}</p>
+                <p className="text-2xl font-bold tracking-tight text-white">
+                  {card.isNumber ? (
+                    <CountUp value={card.value} prefix={card.prefix} />
+                  ) : (
+                    card.value
+                  )}
+                </p>
                 <p className="text-[10px] text-zinc-400 flex items-center gap-1">
                   <TrendingUp className="h-3 w-3 text-emerald-500" />
                   {card.desc}

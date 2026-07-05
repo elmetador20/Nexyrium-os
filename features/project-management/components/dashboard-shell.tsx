@@ -20,7 +20,8 @@ import {
   X,
   Briefcase,
   User,
-  CreditCard
+  CreditCard,
+  Loader2
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
@@ -51,6 +52,20 @@ export function DashboardShell({
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNavigatingTo(null);
+  }, [pathname]);
+
+  const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (navigatingTo) {
+      e.preventDefault();
+      return;
+    }
+    if (pathname === href) return;
+    setNavigatingTo(href);
+  };
 
   useEffect(() => {
     const supabase = createClient();
@@ -214,21 +229,27 @@ export function DashboardShell({
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
+              const isCurrentlyNavigating = navigatingTo === item.href;
               return (
                 <Link
                   key={item.id}
                   href={item.href}
+                  onClick={(e) => handleItemClick(e, item.href)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-3 text-[13px] font-medium rounded-xl transition duration-200 relative group",
+                    "flex items-center gap-3 px-3 py-3 text-[13px] font-medium rounded-xl transition-all duration-200 relative group cursor-pointer",
                     isActive 
-                      ? "bg-zinc-800 text-amber-500 border border-zinc-700 shadow-sm" 
-                      : "text-zinc-400 hover:text-white hover:bg-zinc-800/40"
+                      ? "bg-zinc-800 text-amber-500 border border-zinc-700 shadow-sm scale-[1.02]" 
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-800/40 hover:scale-[1.01]"
                   )}
                 >
-                  <Icon className={cn(
-                    "h-[18px] w-[18px] shrink-0 transition-transform duration-200 group-hover:scale-105",
-                    isActive ? "text-amber-500" : "text-zinc-500 group-hover:text-zinc-300"
-                  )} />
+                  {isCurrentlyNavigating ? (
+                    <Loader2 className="h-[18px] w-[18px] shrink-0 animate-spin text-amber-500" />
+                  ) : (
+                    <Icon className={cn(
+                      "h-[18px] w-[18px] shrink-0 transition-transform duration-200 group-hover:scale-105",
+                      isActive ? "text-amber-500" : "text-zinc-500 group-hover:text-zinc-300"
+                    )} />
+                  )}
                   <span>{item.label}</span>
                   {isActive && (
                     <motion.div
@@ -289,17 +310,25 @@ export function DashboardShell({
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
+            const isCurrentlyNavigating = navigatingTo === item.href;
             return (
               <Link
                 key={item.id}
                 href={item.href}
-                onClick={() => setIsMobileOpen(false)}
+                onClick={(e) => {
+                  setIsMobileOpen(false);
+                  handleItemClick(e, item.href);
+                }}
                 className={cn(
                   "flex items-center gap-3 px-3 py-3 text-[13px] font-medium rounded-xl transition duration-200",
                   isActive ? "bg-zinc-800 text-amber-500" : "text-zinc-400 hover:bg-zinc-800/50"
                 )}
               >
-                <Icon className="h-4.5 w-4.5 shrink-0" />
+                {isCurrentlyNavigating ? (
+                  <Loader2 className="h-4.5 w-4.5 shrink-0 animate-spin text-amber-500" />
+                ) : (
+                  <Icon className="h-4.5 w-4.5 shrink-0" />
+                )}
                 <span>{item.label}</span>
               </Link>
             );
@@ -398,9 +427,11 @@ export function DashboardShell({
         {/* Pages Mount Area */}
         <main className="flex-1 overflow-y-auto custom-scrollbar bg-zinc-950">
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            key={pathname}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
             className="h-full"
           >
             {children}
