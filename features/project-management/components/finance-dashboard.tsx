@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { Invoice, Project } from "../types";
 import { getInvoicesAction, createInvoiceAction, updateInvoiceStatusAction } from "../../../app/actions/projects";
+import { CountUp } from "@/components/ui/count-up";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FinanceDashboardProps {
   initialProjects: Project[];
@@ -147,34 +149,42 @@ export function FinanceDashboard({
 
       {/* Financial Summary */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-emerald-500 shadow-xl animate-in fade-in duration-300">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-emerald-500 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Total Paid Revenue</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">${revenueTotal.toLocaleString()}</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={revenueTotal} prefix="$" />
+            </span>
             <DollarSign className="h-4.5 w-4.5 text-emerald-400" />
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-amber-500 shadow-xl animate-in fade-in duration-300 delay-75">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-amber-500 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-75">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Accounts Receivable</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">${revenuePending.toLocaleString()}</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={revenuePending} prefix="$" />
+            </span>
             <CreditCard className="h-4.5 w-4.5 text-amber-500" />
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-purple-500 shadow-xl animate-in fade-in duration-300 delay-150">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-purple-500 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-150">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Avg Invoice Amount</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">$4,260</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={4260} prefix="$" />
+            </span>
             <TrendingUp className="h-4.5 w-4.5 text-purple-400" />
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-cyan-500 shadow-xl animate-in fade-in duration-300 delay-200">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-cyan-500 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-200">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Collection rate</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">92.4%</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={92} suffix=".4%" />
+            </span>
             <ArrowUpRight className="h-4.5 w-4.5 text-cyan-400" />
           </div>
         </div>
@@ -191,7 +201,25 @@ export function FinanceDashboard({
         </div>
 
         {loading ? (
-          <div className="py-24 text-center text-zinc-550 font-mono">Retrieving invoices...</div>
+          <div className="divide-y divide-zinc-800 animate-pulse">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="p-5 grid grid-cols-6 items-center">
+                <div className="col-span-2 space-y-2">
+                  <Skeleton className="h-3 w-32 rounded bg-zinc-800" />
+                  <Skeleton className="h-2.5 w-48 rounded bg-zinc-800" />
+                </div>
+                <Skeleton className="h-3.5 w-16 rounded bg-zinc-800" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-2.5 w-24 rounded bg-zinc-800" />
+                  <Skeleton className="h-2 w-20 rounded bg-zinc-800" />
+                </div>
+                <Skeleton className="h-4.5 w-12 rounded bg-zinc-800" />
+                <div className="flex justify-end">
+                  <Skeleton className="h-7 w-20 rounded bg-zinc-800" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : invoices.length > 0 ? (
           <div className="divide-y divide-zinc-800">
             {invoices.map((inv) => (

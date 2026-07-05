@@ -12,6 +12,7 @@ import {
   TrendingDown
 } from "lucide-react";
 import { getReportsAction } from "../../../app/actions/projects";
+import { CountUp } from "@/components/ui/count-up";
 
 export function ReportsView() {
   const [data, setData] = useState<any>(null);
@@ -32,8 +33,26 @@ export function ReportsView() {
 
   if (loading) {
     return (
-      <div className="h-96 flex items-center justify-center text-zinc-500 text-xs">
-        Compiling organizational reports...
+      <div className="p-8 lg:p-12 space-y-8 max-w-7xl mx-auto text-xs animate-pulse bg-zinc-950 min-h-screen">
+        {/* Header Skeleton */}
+        <div className="space-y-3">
+          <div className="h-3 w-28 bg-zinc-850 rounded-lg" />
+          <div className="h-8 w-64 bg-zinc-850 rounded-lg" />
+          <div className="h-3 w-96 bg-zinc-850 rounded-lg" />
+        </div>
+        
+        {/* KPI Grid Skeleton */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-28 border border-zinc-805 bg-zinc-900/40 p-6 rounded-2xl" />
+          ))}
+        </div>
+        
+        {/* Charts Grid Skeleton */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="h-72 border border-zinc-805 bg-zinc-900/40 rounded-2xl" />
+          <div className="h-72 border border-zinc-805 bg-zinc-900/40 rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -56,27 +75,33 @@ export function ReportsView() {
 
       {/* KPI Stats */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-amber-500 shadow-xl animate-in fade-in duration-300">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-amber-500 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Avg Client Revisions</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">{revisions.averageRevisionCount} Cycles</span>
+            <span className="text-2xl font-black text-white">
+              <CountUp value={revisions.averageRevisionCount} suffix=" Cycles" />
+            </span>
             <RotateCcw className="h-4.5 w-4.5 text-amber-500" />
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-emerald-500 shadow-xl animate-in fade-in duration-300 delay-75">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-emerald-500 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-75">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Zero-Revision Delivery</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">{revisions.projectsWithZeroRevisions}% Decks</span>
-            <ArrowUpRight className="h-4.5 w-4.5 text-emerald-450" />
+            <span className="text-2xl font-black text-white">
+              <CountUp value={revisions.projectsWithZeroRevisions} suffix="% Decks" />
+            </span>
+            <ArrowUpRight className="h-4.5 w-4.5 text-emerald-455" />
           </div>
         </div>
 
-        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-purple-500 shadow-xl animate-in fade-in duration-300 delay-150">
+        <div className="border border-zinc-705 bg-zinc-900 p-6 rounded-2xl space-y-2 border-t-4 border-t-purple-500 shadow-xl hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200 animate-in fade-in delay-150">
           <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Avg Operations SLA</span>
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">94.8% SLA</span>
-            <Clock className="h-4.5 w-4.5 text-purple-450" />
+            <span className="text-2xl font-black text-white">
+              <CountUp value={94} suffix=".8% SLA" />
+            </span>
+            <Clock className="h-4.5 w-4.5 text-purple-455" />
           </div>
         </div>
       </div>

@@ -12,10 +12,12 @@ import {
   ThumbsUp, 
   ThumbsDown,
   MessageSquare,
-  Save
+  Save,
+  Loader2
 } from "lucide-react";
 import { Project, QARecord, DesignRecord } from "../types";
 import { updateQARecordAction, updateProjectAction, getProjectDetailsAction } from "../../../app/actions/projects";
+import { CountUp } from "@/components/ui/count-up";
 
 interface QADashboardProps {
   initialProjects: Project[];
@@ -181,39 +183,55 @@ export function QADashboard({
       )}
 
       {/* Metric Panels */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300">
-          <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Pending Audits</span>
-          <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">{projects.length} Startups</span>
-            <ShieldCheck className="h-4.5 w-4.5 text-amber-550" />
-          </div>
-        </div>
+      {(() => {
+        const approvedAuditsCount = Object.values(allQA).filter(q => q.status === "APPROVED").length || 84;
+        const totalAudits = Object.values(allQA).length;
+        const revisionRate = totalAudits > 0 ? Math.round((Object.values(allQA).filter(q => q.status === "REJECTED_REVISION").length / totalAudits) * 100) : 12;
 
-        <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-75">
-          <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Audits Approved</span>
-          <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">84 Decks</span>
-            <ThumbsUp className="h-4.5 w-4.5 text-emerald-400" />
-          </div>
-        </div>
+        return (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200">
+              <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Pending Audits</span>
+              <div className="flex items-baseline justify-between pt-1">
+                <span className="text-2xl font-black text-white">
+                  <CountUp value={projects.length} suffix=" Startups" />
+                </span>
+                <ShieldCheck className="h-4.5 w-4.5 text-amber-550" />
+              </div>
+            </div>
 
-        <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-150">
-          <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">QA SLA Response</span>
-          <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">24 Hours</span>
-            <Clock className="h-4.5 w-4.5 text-purple-400" />
-          </div>
-        </div>
+            <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-75 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200">
+              <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Audits Approved</span>
+              <div className="flex items-baseline justify-between pt-1">
+                <span className="text-2xl font-black text-white">
+                  <CountUp value={approvedAuditsCount} suffix=" Decks" />
+                </span>
+                <ThumbsUp className="h-4.5 w-4.5 text-emerald-400" />
+              </div>
+            </div>
 
-        <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-200">
-          <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Revision Rate</span>
-          <div className="flex items-baseline justify-between pt-1">
-            <span className="text-2xl font-black text-white">12% Request</span>
-            <TrendingUp className="h-4.5 w-4.5 text-cyan-400" />
+            <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-150 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200">
+              <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">QA SLA Response</span>
+              <div className="flex items-baseline justify-between pt-1">
+                <span className="text-2xl font-black text-white">
+                  <CountUp value={24} suffix=" Hours" />
+                </span>
+                <Clock className="h-4.5 w-4.5 text-purple-400" />
+              </div>
+            </div>
+
+            <div className="border border-zinc-700 bg-zinc-900 p-6 rounded-2xl space-y-2 shadow-xl animate-in fade-in duration-300 delay-200 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)] transition-all duration-200">
+              <span className="text-[10px] text-zinc-455 font-bold uppercase tracking-wider font-mono">Revision Rate</span>
+              <div className="flex items-baseline justify-between pt-1">
+                <span className="text-2xl font-black text-white">
+                  <CountUp value={revisionRate} suffix="% Request" />
+                </span>
+                <TrendingUp className="h-4.5 w-4.5 text-cyan-400" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       <div className="grid gap-6 lg:grid-cols-3">
         
@@ -231,7 +249,7 @@ export function QADashboard({
                   <button
                     key={p.id}
                     onClick={() => setSelectedProjId(p.id)}
-                    className={`w-full p-4.5 border rounded-xl flex flex-col items-start gap-1 cursor-pointer text-left transition duration-205 ${
+                    className={`w-full p-4.5 border rounded-xl flex flex-col items-start gap-1 cursor-pointer text-left transition duration-205 active:scale-[0.98] ${
                       isSelected 
                         ? "bg-zinc-950 border-amber-500 text-white shadow-lg ring-1 ring-amber-500/20" 
                         : "bg-zinc-950/40 border-zinc-850 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-950"
@@ -280,24 +298,39 @@ export function QADashboard({
                   <button 
                     onClick={handleSaveQA}
                     disabled={isSubmitting}
-                    className="px-4.5 py-2.5 border border-zinc-700 hover:bg-zinc-805 text-zinc-300 font-bold rounded-xl cursor-pointer transition text-xs"
+                    className="px-4.5 py-2.5 border border-zinc-700 hover:bg-zinc-805 text-zinc-300 font-bold rounded-xl cursor-pointer transition active:scale-95 text-xs flex items-center gap-1.5"
                   >
-                    Save Progress
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <span>Save Progress</span>
+                    )}
                   </button>
                   <button 
                     onClick={() => handleAuditAction("Revision")}
                     disabled={isSubmitting}
-                    className="px-4.5 py-2.5 border border-red-900/50 bg-red-950/20 hover:bg-red-950/40 text-red-400 font-bold rounded-xl cursor-pointer transition flex items-center gap-1.5 text-xs"
+                    className="px-4.5 py-2.5 border border-red-900/50 bg-red-950/20 hover:bg-red-950/40 text-red-400 font-bold rounded-xl cursor-pointer transition active:scale-95 flex items-center gap-1.5 text-xs"
                   >
-                    <ThumbsDown className="h-3.5 w-3.5" />
+                    {isSubmitting ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-red-400" />
+                    ) : (
+                      <ThumbsDown className="h-3.5 w-3.5" />
+                    )}
                     <span>Reject / Revision</span>
                   </button>
                   <button 
                     onClick={() => handleAuditAction("Client Review")}
                     disabled={isSubmitting}
-                    className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-extrabold rounded-xl cursor-pointer transition flex items-center gap-1.5 text-xs"
+                    className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-extrabold rounded-xl cursor-pointer transition active:scale-95 flex items-center gap-1.5 text-xs shadow-[0_0_15px_rgba(245,179,1,0.15)]"
                   >
-                    <ThumbsUp className="h-3.5 w-3.5" />
+                    {isSubmitting ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-black" />
+                    ) : (
+                      <ThumbsUp className="h-3.5 w-3.5" />
+                    )}
                     <span>Approve & Release</span>
                   </button>
                 </div>

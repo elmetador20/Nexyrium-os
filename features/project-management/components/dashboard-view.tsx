@@ -24,6 +24,7 @@ import { ProjectDashboardData, Project, Task, TimelineEvent, EmployeeWorkload } 
 import { CreateProjectModal } from "./create-project-modal";
 import { getEmployeeWorkloadAction, updateProjectAction } from "../../../app/actions/projects";
 import { formatFriendlyDate } from "../utils/date";
+import { CountUp } from "@/components/ui/count-up";
 
 interface DashboardViewProps {
   initialData: ProjectDashboardData;
@@ -202,18 +203,20 @@ export function DashboardView({
           {/* KPI Metrics */}
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5 text-xs">
             {[
-              { label: "Active Projects", val: stats.activeProjects, icon: FolderGit2, color: "text-amber-500 border-t-amber-500" },
-              { label: "Due Today", val: stats.projectsDueToday, icon: Clock, color: "text-orange-500 border-t-orange-500" },
-              { label: "Delayed Milestones", val: stats.delayedProjects, icon: AlertTriangle, color: "text-red-500 border-t-red-500" },
-              { label: "Completed (Week)", val: stats.completedThisWeek, icon: CheckCircle2, color: "text-emerald-500 border-t-emerald-500" },
-              { label: "Avg Delivery speed", val: stats.averageDeliveryTime, icon: TrendingUp, color: "text-purple-500 border-t-purple-500" }
+              { label: "Active Projects", val: stats.activeProjects, icon: FolderGit2, color: "text-amber-500 border-t-amber-500", isNumber: true },
+              { label: "Due Today", val: stats.projectsDueToday, icon: Clock, color: "text-orange-500 border-t-orange-500", isNumber: true },
+              { label: "Delayed Milestones", val: stats.delayedProjects, icon: AlertTriangle, color: "text-red-500 border-t-red-500", isNumber: true },
+              { label: "Completed (Week)", val: stats.completedThisWeek, icon: CheckCircle2, color: "text-emerald-500 border-t-emerald-500", isNumber: true },
+              { label: "Avg Delivery speed", val: stats.averageDeliveryTime, icon: TrendingUp, color: "text-purple-500 border-t-purple-500", isNumber: false }
             ].map((kpi, idx) => {
               const Icon = kpi.icon;
               return (
-                <div key={idx} className={`border border-zinc-700 bg-zinc-900 p-8 rounded-2xl border-t-2 ${kpi.color} space-y-3 flex flex-col justify-between shadow-lg`}>
+                <div key={idx} className={`border border-zinc-700 bg-zinc-900 p-8 rounded-2xl border-t-2 ${kpi.color} space-y-3 flex flex-col justify-between shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(245,179,1,0.05)]`}>
                   <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider font-mono">{kpi.label}</span>
                   <div className="flex items-baseline justify-between mt-2">
-                    <span className="text-card-value text-white">{kpi.val}</span>
+                    <span className="text-card-value text-white">
+                      {kpi.isNumber ? <CountUp value={Number(kpi.val) || 0} /> : kpi.val}
+                    </span>
                     <Icon className="h-5 w-5 text-zinc-500" />
                   </div>
                 </div>
