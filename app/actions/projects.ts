@@ -527,7 +527,9 @@ export async function getProjectDashboardAction(): Promise<{
   error?: string;
 }> {
   try {
+    const accessStartedAt = Date.now();
     const { supabase, user, profile } = await verifyAccess();
+    console.info("Operations dashboard query completed", { query: "authorization", latencyMs: Date.now() - accessStartedAt, success: true });
     
     try {
       let query = supabase.from("projects").select("*, client:client_id(*), project_manager:project_manager_id(*)");
@@ -537,7 +539,9 @@ export async function getProjectDashboardAction(): Promise<{
         query = query.or(`designer_id.eq.${user.id},researcher_id.eq.${user.id},content_writer_id.eq.${user.id},qa_id.eq.${user.id}`);
       }
 
+      const projectsStartedAt = Date.now();
       const { data: dbProj, error: errP } = await query;
+      console.info("Operations dashboard query completed", { query: "projects", latencyMs: Date.now() - projectsStartedAt, success: !errP });
       
       if (!errP && dbProj) {
         const projects = dbProj as Project[];
@@ -547,8 +551,16 @@ export async function getProjectDashboardAction(): Promise<{
         let dbTime: any[] = [];
         
         if (projectIds.length > 0) {
-          const { data: tData } = await supabase.from("tasks").select("*, assigned_user:assigned_user_id(*)").in("project_id", projectIds);
-          const { data: tmData } = await supabase.from("project_timeline").select("*, user:user_id(*)").in("project_id", projectIds).order("created_at", { ascending: false });
+          const tasksStartedAt = Date.now();
+          const timelineStartedAt = Date.now();
+          const [taskResponse, timelineResponse] = await Promise.all([
+            supabase.from("tasks").select("*, assigned_user:assigned_user_id(*)").in("project_id", projectIds),
+            supabase.from("project_timeline").select("*, user:user_id(*)").in("project_id", projectIds).order("created_at", { ascending: false }).limit(15),
+          ]);
+          const { data: tData, error: taskError } = taskResponse;
+          const { data: tmData, error: timelineError } = timelineResponse;
+          console.info("Operations dashboard query completed", { query: "tasks", latencyMs: Date.now() - tasksStartedAt, success: !taskError });
+          console.info("Operations dashboard query completed", { query: "project_timeline", latencyMs: Date.now() - timelineStartedAt, success: !timelineError });
           if (tData) dbTask = tData;
           if (tmData) dbTime = tmData;
         }
@@ -1828,11 +1840,15 @@ export async function getEmployeeWorkloadAction(): Promise<{
   error?: string;
 }> {
   try {
+    const accessStartedAt = Date.now();
     const { supabase } = await verifyAccess();
+    console.info("Employee workload query completed", { query: "authorization", latencyMs: Date.now() - accessStartedAt, success: true });
     
     // Attempt to load from DB View first
     try {
-      const { data: viewData, error: viewError } = await supabase.from("employee_workload_stats").select("*");
+      const viewStartedAt = Date.now();
+      const { data: viewData, error: viewError } = await supabase.from("employee_workload_stats").select("user_id,full_name,email,role_name,active_projects_count,active_tasks_count,completed_tasks_count,overdue_tasks_count,efficiency,avg_completion_days,capacity_load,is_overloaded");
+      console.info("Employee workload query completed", { query: "employee_workload_stats", latencyMs: Date.now() - viewStartedAt, success: !viewError });
       if (!viewError && viewData && viewData.length > 0) {
         const workloads: EmployeeWorkload[] = viewData.map((v: any) => ({
           userId: v.user_id,
@@ -1855,14 +1871,24 @@ export async function getEmployeeWorkloadAction(): Promise<{
     }
 
     // 1. Fetch active users and roles
-    const { data: dbUsers, error: errU } = await supabase
-      .from("users")
-      .select("id, full_name, email, role_id")
-      .eq("status", "ACTIVE");
-
-    const { data: dbRoles, error: errR } = await supabase
-      .from("roles")
-      .select("id, name");
+    const usersStartedAt = Date.now();
+    const rolesStartedAt = Date.now();
+    const projectsStartedAt = Date.now();
+    const tasksStartedAt = Date.now();
+    const [usersResponse, rolesResponse, projectsResponse, tasksResponse] = await Promise.all([
+      supabase.from("users").select("id, full_name, email, role_id").eq("status", "ACTIVE"),
+      supabase.from("roles").select("id, name"),
+      supabase.from("projects").select("id, status, project_manager_id, researcher_id, content_writer_id, designer_id, qa_id"),
+      supabase.from("tasks").select("id, status, assigned_user_id, deadline"),
+    ]);
+    const { data: dbUsers, error: errU } = usersResponse;
+    const { data: dbRoles, error: errR } = rolesResponse;
+    const { data: dbProjects, error: errP } = projectsResponse;
+    const { data: dbTasks, error: errT } = tasksResponse;
+    console.info("Employee workload query completed", { query: "users_active", latencyMs: Date.now() - usersStartedAt, success: !errU });
+    console.info("Employee workload query completed", { query: "roles", latencyMs: Date.now() - rolesStartedAt, success: !errR });
+    console.info("Employee workload query completed", { query: "projects", latencyMs: Date.now() - projectsStartedAt, success: !errP });
+    console.info("Employee workload query completed", { query: "tasks", latencyMs: Date.now() - tasksStartedAt, success: !errT });
 
     if (errU || errR || !dbUsers) {
       throw new Error(errU?.message || errR?.message || "Failed to load team profiles.");
@@ -1874,15 +1900,6 @@ export async function getEmployeeWorkloadAction(): Promise<{
         roleMap[r.id] = r.name;
       });
     }
-
-    // 2. Fetch projects and tasks
-    const { data: dbProjects, error: errP } = await supabase
-      .from("projects")
-      .select("id, status, project_manager_id, researcher_id, content_writer_id, designer_id, qa_id");
-
-    const { data: dbTasks, error: errT } = await supabase
-      .from("tasks")
-      .select("id, status, assigned_user_id, deadline");
 
     const projects = (dbProjects || []) as Project[];
     const tasks = (dbTasks || []) as Task[];
@@ -2301,4 +2318,3 @@ export async function getAllQARecordsAction(): Promise<{
   }
   return { success: true, records: mockQA };
 }
-

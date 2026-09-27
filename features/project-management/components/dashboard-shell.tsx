@@ -14,6 +14,7 @@ import {
   ShieldCheck, 
   Calendar, 
   BarChart3, 
+  Sparkles,
   Bell, 
   LogOut, 
   Menu, 
@@ -26,6 +27,7 @@ import {
 import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { AIAgentPanel } from "@/features/ai-agent/components/ai-agent-panel";
 
 interface SidebarItem {
   id: string;
@@ -168,7 +170,8 @@ export function DashboardShell({
     { id: "qa", label: "QA", href: "/dashboard/qa", icon: ShieldCheck },
     { id: "finance", label: "Finance", href: "/dashboard/finance", icon: CreditCard },
     { id: "calendar", label: "Calendar", href: "/dashboard/calendar", icon: Calendar },
-    { id: "reports", label: "Reports", href: "/dashboard/reports", icon: BarChart3 }
+    { id: "reports", label: "Reports", href: "/dashboard/reports", icon: BarChart3 },
+    { id: "ai-control-center", label: "AI Control Center", href: "/dashboard/ai-control-center", icon: Sparkles }
   ];
 
   // Filter menu items based on user role
@@ -439,6 +442,7 @@ export function DashboardShell({
         </main>
       </div>
 
+      <AIAgentPanel />
     </div>
   );
 }
